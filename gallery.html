@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudSnap - Image Gallery</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>☁️ CloudSnap</h1>
+            <p>Cloud-Native Image Sharing Platform</p>
+        </header>
+
+        <nav>
+            <a href="index.html">Upload</a>
+            <a href="gallery.html" class="active">Gallery</a>
+        </nav>
+
+        <main>
+            <div class="gallery-header">
+                <h2>Your Image Gallery</h2>
+                <button id="refreshBtn" class="btn-secondary">🔄 Refresh</button>
+            </div>
+
+            <div id="loader" class="loader" style="display: none;"></div>
+            <div id="status" class="status-message" style="display: none;"></div>
+
+            <div id="galleryGrid" class="gallery-grid">
+                <!-- Images will be loaded here dynamically -->
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <p>📷 No images yet!</p>
+                <p>Upload your first image to get started.</p>
+                <a href="index.html" class="btn-primary">Upload Now</a>
+            </div>
+        </main>
+
+        <footer>
+            <p>CloudSnap © 2024 | Built with Azure Cloud Services</p>
+            <p><small>Student: Prayas Gautam (B00971722) | Module: COM682</small></p>
+        </footer>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Edit Image Title</h3>
+            <form id="editForm">
+                <input type="hidden" id="editImageId">
+                <div class="form-group">
+                    <label for="editTitle">New Title</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+                <button type="submit" class="btn-primary">💾 Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="gallery.js"></script>
+</body>
+</html>
