@@ -152,6 +152,7 @@ async function updateImageTitle() {
     const editTitle = document.getElementById('editTitle');
     const editModal = document.getElementById('editModal');
     const statusDiv = document.getElementById('status');
+    const loader = document.getElementById('loader');
 
     const imageId = editImageId.value;
     const newTitle = editTitle.value.trim();
@@ -169,15 +170,18 @@ async function updateImageTitle() {
             title: newTitle
         };
 
+        loader.style.display = 'block';
+
         const response = await fetch(API_CONFIG.UPDATE_URL, {
-            method: 'PUT',
+            method: 'POST', // Changed from PUT to POST for Azure Logic Apps compatibility
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
         });
 
-        if (response.ok) {
+        // Handle successful responses (200, 201, 204)
+        if (response.ok || response.status === 204) {
             console.log('Update successful');
             showStatus('✅ Image title updated successfully!', 'success');
             editModal.style.display = 'none';
@@ -187,12 +191,15 @@ async function updateImageTitle() {
                 loadImages();
             }, 1000);
         } else {
+            const errorText = await response.text();
             throw new Error(`Update failed: ${response.status} ${response.statusText}`);
         }
 
     } catch (error) {
         console.error('Update error:', error);
         showStatus(`❌ Update failed: ${error.message}`, 'error');
+    } finally {
+        loader.style.display = 'none';
     }
 }
 
@@ -218,16 +225,18 @@ async function deleteImage(imageId, blobURL) {
         };
 
         loader.style.display = 'block';
+        statusDiv.style.display = 'none';
 
         const response = await fetch(API_CONFIG.DELETE_URL, {
-            method: 'DELETE',
+            method: 'POST', // Changed from DELETE to POST for Azure Logic Apps compatibility
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
         });
 
-        if (response.ok) {
+        // Handle successful responses (200, 201, 204, even 404 if already deleted)
+        if (response.ok || response.status === 204 || response.status === 404) {
             console.log('Delete successful');
             showStatus('✅ Image deleted successfully!', 'success');
             
@@ -236,7 +245,17 @@ async function deleteImage(imageId, blobURL) {
                 loadImages();
             }, 1000);
         } else {
-            throw new Error(`Delete failed: ${response.status} ${response.statusText}`);
+            // Try to get error details
+            let errorMessage = `${response.status} ${response.statusText}`;
+            try {
+                const errorData = await response.json();
+                if (errorData.message) {
+                    errorMessage = errorData.message;
+                }
+            } catch (e) {
+                // If response is not JSON, use status text
+            }
+            throw new Error(`Delete failed: ${errorMessage}`);
         }
 
     } catch (error) {
